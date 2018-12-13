@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	static boolean playAgain = false;
+//	int winCondition = 0; // 0 is lose, 1 is win, 2 is run away
 	
 	boolean ready = true;
 	public void countdown(int secs) {
@@ -71,6 +72,30 @@ public class Main extends Application {
 			px += 75;
 		}
 	}
+	
+// feelsbad didn't have time to implement
+//	public void checkWin(int winCondition) {
+//		switch(winCondition){
+//		case 0:
+//			Label loseTitle = new Label("ha ha you lose succer");
+//			loseTitle.setPrefSize(355, 100);
+//			loseTitle.setFont(new Font("Zapfino", 32));
+//			loseTitle.setAlignment(Pos.CENTER);
+//			endRoot.setTop(loseTitle);
+//		case 1:
+//			Label winTitle = new Label("yaaaaaaaaaaaaaaaaaayy");
+//			winTitle.setPrefSize(355, 100);
+//			winTitle.setFont(new Font("Zapfino", 32));
+//			winTitle.setAlignment(Pos.CENTER);
+//			endRoot.setTop(winTitle);
+//		case 2:
+//			 Label runTitle = new Label("you bad you run away");
+//			 runTitle.setPrefSize(355, 100);
+//			 runTitle.setFont(new Font("Zapfino", 32));
+//			 runTitle.setAlignment(Pos.CENTER);
+//			 endRoot.setTop(runTitle);
+//		}
+//	}
 
 	public void start(Stage window) throws Exception {
 		int SCREENX = 800;
@@ -81,15 +106,15 @@ public class Main extends Application {
 		BorderPane endRoot = new BorderPane();
 		endRoot.setPrefSize(400, 600);
 		
-		Label winTitle = new Label("yaaaaaaaaaaaaaaaaaayy");
-		winTitle.setPrefSize(355, 87);
-		winTitle.setFont(new Font("Zapfino", 32));
-		winTitle.setAlignment(Pos.CENTER);
-		endRoot.setTop(winTitle);
-		
 		Button replay = new Button("replay");
 		replay.setPrefSize(317, 145);
 		endRoot.setCenter(replay);
+		
+		Label winTitle = new Label("yaaaaaaaaaaaaaaaaaayy");
+		winTitle.setPrefSize(355, 100);
+		winTitle.setFont(new Font("Zapfino", 32));
+		winTitle.setAlignment(Pos.CENTER);
+		endRoot.setTop(winTitle);
 		
 		Scene end = new Scene(endRoot, SCREENX, SCREENY);
 
@@ -162,13 +187,36 @@ public class Main extends Application {
 				double elapsedTime = (currentNanoTime - lastNanoTime) / 1000000000.0;
 				lastNanoTime = currentNanoTime;
 				
-				// win / lose conditions
-				if(lives == 0) {
-					stop();
-					window.setScene(end);
+				if(playAgain) {
+					//stop em
+					player.setVelocity(0, 0);
+					heart.setVelocity(0, 0);
+					
+					//clear em
+					enemyBullets.clear();
+					input.clear();
+					bulletList.clear();
+					enemyList.clear();
+					
+					//fill em
+					createObjs(enemyList, bulletList, numBullets);
+					
+					//reset em positions and velocitys
+					heart.setPosition(SCREENX / 2 - 50 + 19 - 4, SCREENY - 90 + 20);
+					player.setPosition(SCREENX / 2 - 50, SCREENY - 90);
+					player.setVelocity(0, 0);
+					
+					//reset em globals
+					bIndex = bulletList.size() - 1;
+					bLeft = numBullets;
+					enemyLeft = 20;
+					lives = 3;
+ 
+					playAgain = false;
 				}
 				
-				if (enemyLeft == 0) {
+				// win / lose conditions
+				if(enemyLeft == 0 || lives == 0) {
 					stop();
 					window.setScene(end);
 				}
@@ -208,12 +256,18 @@ public class Main extends Application {
 
 				//check if out of bounds on x-axis
 				if (player.getPosX() > SCREENX) {
+					heart.setPosition(19, heart.getPosY());
 					player.setPosition(0, player.getPosY());
 				}
 
 				if (player.getPosX() < 0) {
+					heart.setPosition(SCREENX + 19, heart.getPosY());
 					player.setPosition(SCREENX, player.getPosY());
 				}
+				
+//				if(player.getPosY() > SCREENY) {
+//					player.setPosition(player.getPosX(), SCREENY);
+//				}
 
 				heart.update(elapsedTime);
 				player.update(elapsedTime);
@@ -235,7 +289,7 @@ public class Main extends Application {
 				while (enemyIter.hasNext()) {
 					Sprite enemy = enemyIter.next();
 					if (enemy.intersects(player)) {
-						System.out.println("roflmao how you even died, they dont even move");
+						System.out.println("roflmao how you even died, they move super slow");
 						System.exit(0);
 					}
 
@@ -281,42 +335,18 @@ public class Main extends Application {
 				}
 
 				for (Sprite enemy : enemyList) {
+					enemy.setVelocity(0, 20);
+					enemy.update(elapsedTime);
 					enemy.render(gc);
 				}
 
-				String bText = "Bullets: " + bLeft;
 				String lText = "Lives: " + lives;
 				gc.fillText(lText, 20, 20);
 				gc.strokeText(lText, 20, 20);
+				
+				String bText = "Bullets: " + bLeft;
 				gc.fillText(bText, 360, 36);
 				gc.strokeText(bText, 360, 36);
-				
-				if(playAgain) {
-					//stop em
-					player.setVelocity(0, 0);
-					heart.setVelocity(0, 0);
-					
-					//clear em
-					enemyBullets.clear();
-					input.clear();
-					bulletList.clear();
-					enemyList.clear();
-					
-					//fill em
-					createObjs(enemyList, bulletList, numBullets);
-					
-					//reset em positions and velocitys
-					heart.setPosition(SCREENX / 2 - 50 + 19 - 4, SCREENY - 90 + 20);
-					player.setPosition(SCREENX / 2 - 50, SCREENY - 90);
-					player.setVelocity(0, 0);
-					
-					//reset em globals
-					bIndex = bulletList.size() - 1;
-					bLeft = numBullets;
-					enemyLeft = 20;
-					lives = 3;
-					playAgain = false;
-				}
 			}
 		};
 		
