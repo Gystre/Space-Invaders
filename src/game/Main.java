@@ -94,10 +94,16 @@ public class Main extends Application {
 		endRoot.setCenter(replay);
 		
 		Label winTitle = new Label("yaaaaaaaaaaaaaaaaaayy");
-		winTitle.setPrefSize(355, 100);
+		winTitle.setPrefSize(500, 700);
 		winTitle.setFont(new Font("Zapfino", 32));
 		winTitle.setAlignment(Pos.CENTER);
 		endRoot.setTop(winTitle);
+		
+		Label timeTaken = new Label("");
+		timeTaken.setPrefSize(500, 700);
+		timeTaken.setFont(new Font("Arial", 30));
+		timeTaken.setAlignment(Pos.CENTER);
+		endRoot.setCenter(timeTaken);
 		
 		Scene end = new Scene(endRoot, SCREENX, SCREENY);
 
@@ -168,6 +174,7 @@ public class Main extends Application {
 		
 		// main game loop (60 times per second)
 		AnimationTimer GameLoop = new AnimationTimer() {
+			long startTime = System.currentTimeMillis();
 			long lastNanoTime = System.nanoTime();
 			int bIndex = bulletList.size();
 			int lives = 3;
@@ -205,6 +212,7 @@ public class Main extends Application {
 				if(enemyList.size() == 0 || lives == 0) {
 					stop();
 					timer.cancel();
+					timeTaken.setText("Time taken: " + (System.currentTimeMillis() - startTime) / 1000L + " seconds");
 					window.setScene(end);
 				}
 
