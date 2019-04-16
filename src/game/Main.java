@@ -96,10 +96,10 @@ public class Main extends Application {
 		Label winTitle = new Label("yaaaaaaaaaaaaaaaaaayy");
 		winTitle.setPrefSize(500, 700);
 		winTitle.setFont(new Font("Zapfino", 32));
-		winTitle.setAlignment(Pos.CENTER);
-		endRoot.setTop(winTitle);
+		winTitle.setAlignment(Pos.TOP_CENTER);
+		//endRoot.setTop(winTitle);
 		
-		Label timeTaken = new Label("");
+		Label timeTaken = new Label("2 fast");
 		timeTaken.setPrefSize(500, 700);
 		timeTaken.setFont(new Font("Arial", 30));
 		timeTaken.setAlignment(Pos.CENTER);
@@ -161,17 +161,6 @@ public class Main extends Application {
 
 		createObjs(enemyList, bulletList, numBullets);
 		
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-			float wow = 0;
-			
-			@Override
-			public void run() {
-				wow += 0.1;
-				System.out.println(wow);
-			}
-		}, 100, 100);
-		
 		// main game loop (60 times per second)
 		AnimationTimer GameLoop = new AnimationTimer() {
 			long startTime = System.currentTimeMillis();
@@ -211,7 +200,6 @@ public class Main extends Application {
 				// win / lose conditions
 				if(enemyList.size() == 0 || lives == 0) {
 					stop();
-					timer.cancel();
 					timeTaken.setText("Time taken: " + (System.currentTimeMillis() - startTime) / 1000L + " seconds");
 					window.setScene(end);
 				}
